@@ -78,12 +78,11 @@
         if (!touched) {
           blockRef.move(x, y)
           this.updateGuide()
-        } else if (y < 0) {
-          groundRef.push(blockRef.cells)
-          this.$nextTick().then(() => {
+        } else if (y < 0) { // go down and touched
+          if (groundRef.push(blockRef.cells)) {
             this.block = null
-            return this.$nextTick()
-          }).then(this.next) // force recreate state
+            this.$nextTick(this.next) // force recreate state
+          } else this.dead()
         }
         return touched
       },
@@ -124,6 +123,7 @@
         this.nextBlock = this.createBlock()
       },
       dead () {
+        if (this.state.dead) return
         this.state.dead = true
         setTimeout(() => window.alert('dead'), 100)
         this.$emit('dead', this)
@@ -132,17 +132,9 @@
         this.block = Object.assign({}, this.nextBlock)
         this.block.pos = [Math.floor(this.width / 2), this.height + 1]
         this.$nextTick(() => {
-          let {blockRef, groundRef} = this.$refs
-          let touched = groundRef.checkTouched(blockRef.predictMove(0, -1))
-          if (touched) { // can't create next block
-            this.block = null
-            this.dead()
-          } else {
-            this.move(0, -1)
-            this.move(0, -1)
-            this.createNextBlock()
-            this.updateGuide()
-          }
+          this.move(0, -1)
+          this.move(0, -1)
+          this.createNextBlock()
         })
       }
     },
