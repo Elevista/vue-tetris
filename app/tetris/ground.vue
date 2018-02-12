@@ -16,7 +16,13 @@
     name: 'ground',
     mixins: [stageComputed],
     props: ['stage'],
+    data () { return {ground: [[]]} },
     methods: {
+      reset () {
+        let {width, height} = this.stage
+        let total = width * height
+        this.ground = _.chain(total).times(() => null).chunk(width).value()
+      },
       checkTouched (cells) {
         for (let [x, y] of cells) {
           if (x < 0 || x >= this.width) return 'wall'
