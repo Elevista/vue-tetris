@@ -44,14 +44,14 @@
     border-bottom-color: yellow;
   }
   .cell.T {
-    background-color: purple;
-    border-right-color: purple;
-    border-bottom-color: purple;
+    background-color: magenta;
+    border-right-color: magenta;
+    border-bottom-color: magenta;
   }
   .cell.S {
-    background-color: green;
-    border-right-color: green;
-    border-bottom-color: green;
+    background-color: lime;
+    border-right-color: lime;
+    border-bottom-color: lime;
   }
   .cell.Z {
     background-color: red;
