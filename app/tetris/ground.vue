@@ -26,15 +26,19 @@
         return false
       },
       clearRow () {
-        let ret = 0
+        let rows = 0
+        let empty = 0
         for (let i = this.ground.length - 1; i >= 0; i--) {
           let row = this.ground[i]
-          if (!_.every(row)) continue
-          this.ground.splice(i, 1)
-          this.ground.push(_.times(this.width, () => null))
-          ret++
+          if (_.every(row)) {
+            this.ground.splice(i, 1)
+            this.ground.push(_.times(this.width, () => null))
+            rows++
+            empty++ // current row cleared
+          } else if (_.every(row, x => !x)) empty++
         }
-        return ret
+        empty === this.ground.length && this.$emit('clearAll')
+        rows && this.$emit('clearRow', rows)
       },
       push (cells) {
         for (let cell of cells) {
