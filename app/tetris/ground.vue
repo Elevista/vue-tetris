@@ -26,7 +26,7 @@
       checkTouched (cells) {
         for (let [x, y] of cells) {
           if (x < 0 || x >= this.width) return 'wall'
-          if (y >= this.height) continue // 세로로 넘는것은 무사 통과
+          if (y >= this.height) continue
           if (y < 0 || this.ground[y][x]) return 'ground'
         }
         return false

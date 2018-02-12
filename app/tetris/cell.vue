@@ -1,5 +1,5 @@
 <template>
-  <div :style="style" :class="data.class||'empty'" class="cell"></div>
+  <div :style="style" :class="data.class" class="cell"></div>
 </template>
 
 <script>

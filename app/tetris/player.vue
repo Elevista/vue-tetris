@@ -25,8 +25,8 @@
         </div>
       </div>
       <div class="buttons">
-        <button v-if="!state.playing" @click="start" autofocus>{{state.gameover?'Restart':'Start'}}</button>
-        <button v-else @click="pause">{{state.pause?'Resume':'Pause'}}</button>
+        <button v-if="state.playing" @click="pause">{{state.pause?'Resume':'Pause'}}</button>
+        <button v-else @click="start" autofocus>{{state.gameover?'Restart':'Start'}}</button>
       </div>
       <h2 class="state">{{stateText}}</h2>
     </div>
@@ -56,14 +56,9 @@
       }
     },
     computed: {
-      tickTime () {
-        return ((11 - Math.max(0, this.level)) * 50)
-      },
+      tickTime () { return (11 - Math.max(0, this.level)) * 50 },
       nextBlockStyle () {
-        return {
-          left: `calc(50% - ${this.cellSize}px)`,
-          top: `calc(50% + ${this.cellSize}px)`
-        }
+        return {left: `calc(50% - ${this.cellSize}px)`, top: `calc(50% + ${this.cellSize}px)`}
       },
       canPlay () {
         let {gameover, pause, playing} = this.state
@@ -76,7 +71,7 @@
         return ''
       }
     },
-    mounted () {
+    created () {
       _.forEach(this.keys, (v, k) => this.$set(this.actionOf, v, k))
       window.addEventListener('keydown', this.keydown)
     },
@@ -87,7 +82,7 @@
         this.$refs.groundRef.reset()
         this.createNextBlock()
         this.next()
-        this.$nextTick(() => setTimeout(this.tick, this.tickTime))
+        this.$nextTick(() => { this.tickTimeout = setTimeout(this.tick, this.tickTime) })
         this.state.playing = true
       },
       tick () {
@@ -100,9 +95,7 @@
         this.getScore([0, 40, 100, 300, 1200][n] * (this.level + 1))
         this.level = Math.floor(this.rowCleared / 10)
       },
-      clearAll () {
-        this.getScore(3000 * (this.level + 1))
-      },
+      clearAll () { this.getScore(3000 * (this.level + 1)) },
       keydown ($event) {
         if (!this.state.playing) return
         if ($event.keyCode === 27) return this.pause()
@@ -133,7 +126,7 @@
       pause () {
         if (this.state.pause) {
           this.state.pause = false
-          setTimeout(this.tick, this.tickTime)
+          this.tickTimeout = setTimeout(this.tick, this.tickTime)
         } else {
           this.state.pause = true
           clearTimeout(this.tickTimeout)
@@ -188,18 +181,14 @@
             return false
           })
       },
-      createBlock () {
+      createNextBlock () {
         let type = this.blocks[Math.floor(Math.random() * this.blocks.length)]
         let shapes = this.blockType[type]
-        return {shapes, pos: [0, 0], class: type, id: blockId++}
-      },
-      createNextBlock () {
-        this.nextBlock = this.createBlock()
+        this.nextBlock = {shapes, pos: [0, 0], class: type, id: blockId++}
       },
       gameover () {
         if (this.state.gameover) return
-        this.state.gameover = true
-        this.state.playing = false
+        Object.assign(this.state, {gameover: true, playing: false})
         clearTimeout(this.tickTimeout)
         this.$emit('gameover', this)
       },
@@ -219,7 +208,7 @@
 </script>
 
 <style scoped>
-  .player {white-space: nowrap;display: inline-block;background: #e2f5ec;padding: 30px; color: #222;}
+  .player {white-space: nowrap;display: inline-block;background: #e2f5ec;padding: 30px; color: #222;border: solid 1px #b7b7b7;}
   .player > * {display: inline-block; vertical-align: top;}
   .game {position: relative;outline: solid 1px gray;background-color: black; overflow: hidden;}
   .buttons {text-align: center;}
