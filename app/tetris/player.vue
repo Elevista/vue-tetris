@@ -39,7 +39,7 @@
     },
     mounted () {
       window.addEventListener('keydown', this.keydown)
-      this.tick()
+      setTimeout(this.tick, this.tickTime)
     },
     methods: {
       tick () {
@@ -130,7 +130,7 @@
       },
       next () {
         this.block = Object.assign({}, this.nextBlock)
-        this.block.pos = [Math.floor(this.width / 2), this.height + 1]
+        this.block.pos = [Math.floor(this.width / 2), this.height]
         this.$nextTick(() => {
           this.move(0, -1)
           this.move(0, -1)
