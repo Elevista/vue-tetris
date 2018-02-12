@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="buttons">
-        <button v-if="!state.playing" @click="start">{{state.gameover?'Restart':'Start'}}</button>
+        <button v-if="!state.playing" @click="start" autofocus>{{state.gameover?'Restart':'Start'}}</button>
         <button v-else @click="pause">{{state.pause?'Resume':'Pause'}}</button>
       </div>
       <h2 class="state">{{stateText}}</h2>
@@ -104,8 +104,9 @@
         this.getScore(3000 * (this.level + 1))
       },
       keydown ($event) {
-        if (this.state.gameover) return
+        if (!this.state.playing) return
         if ($event.keyCode === 27) return this.pause()
+        if (!this.canPlay) return
         switch (this.actionOf[$event.keyCode]) {
           case 'straight':
             this.moveStraight()
@@ -222,6 +223,7 @@
   .player > * {display: inline-block; vertical-align: top;}
   .game {position: relative;outline: solid 1px gray;background-color: black; overflow: hidden;}
   .buttons {text-align: center;}
+  .buttons button {font-size: 30px;}
   .panel {padding: 30px;}
   .nextText {height: 20px;text-align: center;}
   .nextBox {width: 160px;height: 160px;position: relative;background-color: #222;}
