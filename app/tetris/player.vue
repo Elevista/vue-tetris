@@ -1,12 +1,17 @@
 <template>
   <div class="player">
     <div :style="{height:height*cellSize+'px',width:width*cellSize+'px'}" class="game">
-      <ground :stage="stage" ref="groundRef" class="ground"/>
+      <ground :stage="stage" ref="groundRef" class="ground" @clearRow="clearRow" @clearAll="clearAll"/>
       <block v-if="block" :init="block" :stage="stage" ref="guideRef" class="guide"/>
       <block v-if="block" :init="block" :stage="stage" ref="blockRef" :key="block.id"/>
     </div>
-    <div class="nextBox">
-      <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next" :style="nextBlockStyle"/>
+    <div class="panel">
+      <div class="nextBox">
+        <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next" :style="nextBlockStyle"/>
+      </div>
+      <div class="score">
+
+      </div>
     </div>
   </div>
 </template>
@@ -22,14 +27,30 @@
     props: ['stage', 'keys'],
     mixins: [stageComputed],
     data () {
-      return {block: null, nextBlock: null, actionOf: {}, state: {dead: false}, lastTime: Date.now()}
+      return {
+        block: null,
+        nextBlock: null,
+        actionOf: {},
+        state: {gameover: false, pause: false},
+        rowCleared: 0,
+        level: 0,
+        score: 0,
+        tickTimeout: 0
+      }
     },
     computed: {
+      tickTime () {
+        return ((11 - Math.max(0, this.level)) * 50)
+      },
       nextBlockStyle () {
         return {
-          left: `calc(50% - ${this.cellSize / 2}px)`,
-          top: `calc(50% + ${this.cellSize / 2}px)`
+          left: `calc(50% - ${this.cellSize}px)`,
+          top: `calc(50% + ${this.cellSize}px)`
         }
+      },
+      canPlay () {
+        let {gameover, pause} = this.state
+        return !gameover && !pause
       }
     },
     beforeMount () {
@@ -43,12 +64,21 @@
     },
     methods: {
       tick () {
-        if (this.state.dead) return
+        if (!this.canPlay) return
         this.move(0, -1)
-        setTimeout(this.tick, this.tickTime)
+        this.tickTimeout = setTimeout(this.tick, this.tickTime)
+      },
+      clearRow (n) {
+        this.rowCleared += n
+        this.getScore([0, 40, 100, 300, 1200][n] * (this.level + 1))
+        this.level = Math.floor(this.rowCleared / 10)
+      },
+      clearAll () {
+        this.getScore(3000 * (this.level + 1))
       },
       keydown ($event) {
-        if (this.state.dead) return
+        if (this.state.gameover) return
+        if ($event.keyCode === 27) return this.pause()
         switch (this.actionOf[$event.keyCode]) {
           case 'straight':
             this.moveStraight()
@@ -72,6 +102,16 @@
             break
         }
       },
+      pause () {
+        if (this.state.pause) {
+          this.state.pause = false
+          setTimeout(this.tick, this.tickTime)
+        } else {
+          this.state.pause = true
+          clearTimeout(this.tickTimeout)
+        }
+        this.$emit('pause', this.state.pause)
+      },
       move (x, y) {
         let {blockRef, groundRef} = this.$refs
         let touched = groundRef.checkTouched(blockRef.predictMove(x, y))
@@ -79,15 +119,21 @@
           blockRef.move(x, y)
           this.updateGuide()
         } else if (y < 0) { // go down and touched
+          this.getScore(3 * (this.level + 1))
           if (groundRef.push(blockRef.cells)) {
             this.block = null
             this.$nextTick(this.next) // force recreate state
-          } else this.dead()
+          } else this.gameover()
         }
         return touched
       },
       moveStraight () {
         while (!this.move(0, -1)) {}
+        this.getScore(21 + (3 * this.level))
+      },
+      getScore (v) {
+        if (!this.canPlay) return
+        this.score += v
       },
       updateGuide () {
         let {guideRef, blockRef, groundRef} = this.$refs
@@ -122,11 +168,12 @@
       createNextBlock () {
         this.nextBlock = this.createBlock()
       },
-      dead () {
-        if (this.state.dead) return
-        this.state.dead = true
-        setTimeout(() => window.alert('dead'), 100)
-        this.$emit('dead', this)
+      gameover () {
+        if (this.state.gameover) return
+        this.state.gameover = true
+        clearTimeout(this.tickTimeout)
+        setTimeout(() => window.alert('gameover'), 100)
+        this.$emit('gameover', this)
       },
       next () {
         this.block = Object.assign({}, this.nextBlock)
@@ -144,8 +191,9 @@
 </script>
 
 <style scoped>
-  .player > * {display: inline-block;}
+  .player {white-space: nowrap;}
+  .player > * {display: inline-block; vertical-align: top;}
   .game {position: relative;outline: solid 1px gray;background-color: black; overflow: hidden;}
-  .nextBox {width: 160px;height: 160px;position: relative;background-color: black; vertical-align: top;margin: 30px;}
+  .nextBox {width: 160px;height: 160px;position: relative;background-color: black;margin: 30px;}
   .nextBox .next {position: absolute;}
 </style>

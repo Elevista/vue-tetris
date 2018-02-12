@@ -6,6 +6,5 @@ export default {
     height () { return this.stage.height },
     blocks () { return this.stage.blocks },
     blockType () { return this.stage.blockType },
-    tickTime () { return this.stage.tickTime }
   }
 }
