@@ -4,8 +4,8 @@ export default {
     cellSize () { return this.stage.cellSize },
     width () { return this.stage.width },
     height () { return this.stage.height },
-    blockShapes () { return this.stage.blockShapes },
-    classes () { return this.stage.classes },
+    blocks () { return this.stage.blocks },
+    blockType () { return this.stage.blockType },
     tickTime () { return this.stage.tickTime }
   }
 }

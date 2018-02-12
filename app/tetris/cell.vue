@@ -24,25 +24,49 @@
 
 <style scoped>
 
+
   .cell {
     position: absolute;
     box-sizing: border-box;
+    border-style: outset;
+    border-width: 3px;
+    border-top-color: rgba(255, 255, 255, 0.3);
+    border-left-color: rgba(255, 255, 255, 0.3);
   }
-  .cell.red {
-    background-color: red;
-    border: outset 3px lightcoral;
+  .cell.I {
+    background-color: cyan;
+    border-right-color: cyan;
+    border-bottom-color: cyan;
   }
-  .cell.blue {
-    background-color: blue;
-    border: outset 3px lightskyblue;
-  }
-  .cell.green {
-    background-color: green;
-    border: outset 3px lightgreen;
-  }
-  .cell.yellow {
+  .cell.O {
     background-color: yellow;
-    border: outset 3px lightyellow;
+    border-right-color: yellow;
+    border-bottom-color: yellow;
+  }
+  .cell.T {
+    background-color: purple;
+    border-right-color: purple;
+    border-bottom-color: purple;
+  }
+  .cell.S {
+    background-color: green;
+    border-right-color: green;
+    border-bottom-color: green;
+  }
+  .cell.Z {
+    background-color: red;
+    border-right-color: red;
+    border-bottom-color: red;
+  }
+  .cell.J {
+    background-color: blue;
+    border-right-color: blue;
+    border-bottom-color: blue;
+  }
+  .cell.L {
+    background-color: orange;
+    border-right-color: orange;
+    border-bottom-color: orange;
   }
 
 </style>

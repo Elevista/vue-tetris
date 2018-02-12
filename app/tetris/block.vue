@@ -48,5 +48,5 @@
 </script>
 
 <style scoped>
-  .block.guide {opacity: 0.2}
+  .block.guide {opacity: 0.3}
 </style>
