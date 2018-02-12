@@ -1,4 +1,4 @@
-import tetris from './tetris/tetris'
+import tetris from './tetris/tetris.vue'
 import 'animate.css/animate.css'
 
 export default {

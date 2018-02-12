@@ -6,7 +6,7 @@
       <block v-if="block" :init="block" :stage="stage" ref="blockRef" :key="block.id"/>
     </div>
     <div class="nextBox">
-      <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next"/>
+      <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next" :style="nextBlockStyle"/>
     </div>
   </div>
 </template>
@@ -22,7 +22,15 @@
     props: ['stage', 'keys'],
     mixins: [stageComputed],
     data () {
-      return {block: null, nextBlock: null, lastClass: '', actionOf: {}, state: {dead: false}, lastTime: Date.now()}
+      return {block: null, nextBlock: null, actionOf: {}, state: {dead: false}, lastTime: Date.now()}
+    },
+    computed: {
+      nextBlockStyle () {
+        return {
+          left: `calc(50% - ${this.cellSize / 2}px)`,
+          top: `calc(50% + ${this.cellSize / 2}px)`
+        }
+      }
     },
     beforeMount () {
       this.createNextBlock()
@@ -108,13 +116,9 @@
           })
       },
       createBlock () {
-        let cls
-        do {
-          cls = this.classes[Math.floor(Math.random() * this.classes.length)]
-        } while (cls === this.lastClass)
-        this.lastClass = cls
-        let shapes = this.blockShapes[Math.floor(Math.random() * this.blockShapes.length)]
-        return {shapes, pos: [0, 0], class: cls, id: blockId++}
+        let type = this.blocks[Math.floor(Math.random() * this.blocks.length)]
+        let shapes = this.blockType[type]
+        return {shapes, pos: [0, 0], class: type, id: blockId++}
       },
       createNextBlock () {
         this.nextBlock = this.createBlock()
@@ -126,7 +130,7 @@
       },
       next () {
         this.block = Object.assign({}, this.nextBlock)
-        this.block.pos = [Math.floor(this.width / 2), this.height]
+        this.block.pos = [Math.floor(this.width / 2), this.height + 1]
         this.$nextTick(() => {
           let {blockRef, groundRef} = this.$refs
           let touched = groundRef.checkTouched(blockRef.predictMove(0, -1))
@@ -134,26 +138,22 @@
             this.block = null
             this.dead()
           } else {
+            this.move(0, -1)
+            this.move(0, -1)
             this.createNextBlock()
             this.updateGuide()
           }
         })
       }
     },
-    destroyed () {
-      window.removeEventListener('keyodwn', this.keydown)
-    },
-    components: {
-      ground,
-      block
-    }
+    destroyed () { window.removeEventListener('keyodwn', this.keydown) },
+    components: {ground, block}
   }
 </script>
 
 <style scoped>
-  .player > * {float: left;}
-  .player:after {content: ''; display: block;clear: both;}
-  .game {position: relative;outline: solid 1px gray}
-  .nextBox {width: 160px;height: 160px;position: relative}
-  .nextBox .next {position: absolute;left: 35%;bottom: 50%;}
+  .player > * {display: inline-block;}
+  .game {position: relative;outline: solid 1px gray;background-color: black; overflow: hidden;}
+  .nextBox {width: 160px;height: 160px;position: relative;background-color: black; vertical-align: top;margin: 30px;}
+  .nextBox .next {position: absolute;}
 </style>
