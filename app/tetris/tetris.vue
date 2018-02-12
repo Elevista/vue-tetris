@@ -17,7 +17,6 @@
           cellSize: 30,
           width: 10,
           height: 22,
-          ground: [[]],
           blockType: {
             I: [
               [[-1, 1], [0, 1], [1, 1], [2, 1]],
@@ -62,11 +61,6 @@
           blocks: ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
         }
       }
-    },
-    created () {
-      let {width, height} = this.stage
-      let total = width * height
-      this.stage.ground = _.chain(total).times(() => null).chunk(width).value()
     },
     components: {player}
   }

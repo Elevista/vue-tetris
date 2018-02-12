@@ -6,12 +6,29 @@
       <block v-if="block" :init="block" :stage="stage" ref="blockRef" :key="block.id"/>
     </div>
     <div class="panel">
+      <h2 class="nextText">Next</h2>
       <div class="nextBox">
         <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next" :style="nextBlockStyle"/>
       </div>
       <div class="score">
-
+        <div class="row">
+          <h4 class="title">Level</h4>
+          <span>{{level|numberComma}}</span>
+        </div>
+        <div class="row">
+          <h4 class="title">Score</h4>
+          <span>{{score|numberComma}}</span>
+        </div>
+        <div class="row">
+          <h4 class="title">Rows</h4>
+          <span>{{rowCleared|numberComma}}</span>
+        </div>
       </div>
+      <div class="buttons">
+        <button v-if="!state.playing" @click="start">{{state.gameover?'Restart':'Start'}}</button>
+        <button v-else @click="pause">{{state.pause?'Resume':'Pause'}}</button>
+      </div>
+      <h2 class="state">{{stateText}}</h2>
     </div>
   </div>
 </template>
@@ -31,7 +48,7 @@
         block: null,
         nextBlock: null,
         actionOf: {},
-        state: {gameover: false, pause: false},
+        state: {playing: false, gameover: false, pause: false},
         rowCleared: 0,
         level: 0,
         score: 0,
@@ -49,20 +66,30 @@
         }
       },
       canPlay () {
+        let {gameover, pause, playing} = this.state
+        return !gameover && !pause && playing
+      },
+      stateText () {
         let {gameover, pause} = this.state
-        return !gameover && !pause
+        if (gameover) return 'Game Over!'
+        if (pause) return 'Pause'
+        return ''
       }
     },
-    beforeMount () {
-      this.createNextBlock()
-      this.next()
-      _.forEach(this.keys, (v, k) => this.$set(this.actionOf, v, k))
-    },
     mounted () {
+      _.forEach(this.keys, (v, k) => this.$set(this.actionOf, v, k))
       window.addEventListener('keydown', this.keydown)
-      setTimeout(this.tick, this.tickTime)
     },
     methods: {
+      start () {
+        if (this.state.playing) return
+        Object.assign(this, {rowCleared: 0, level: 0, score: 0, state: {playing: true, gameover: false, pause: false}})
+        this.$refs.groundRef.reset()
+        this.createNextBlock()
+        this.next()
+        this.$nextTick(() => setTimeout(this.tick, this.tickTime))
+        this.state.playing = true
+      },
       tick () {
         if (!this.canPlay) return
         this.move(0, -1)
@@ -171,8 +198,8 @@
       gameover () {
         if (this.state.gameover) return
         this.state.gameover = true
+        this.state.playing = false
         clearTimeout(this.tickTimeout)
-        setTimeout(() => window.alert('gameover'), 100)
         this.$emit('gameover', this)
       },
       next () {
@@ -191,9 +218,17 @@
 </script>
 
 <style scoped>
-  .player {white-space: nowrap;}
+  .player {white-space: nowrap;display: inline-block;background: #e2f5ec;padding: 30px; color: #222;}
   .player > * {display: inline-block; vertical-align: top;}
   .game {position: relative;outline: solid 1px gray;background-color: black; overflow: hidden;}
-  .nextBox {width: 160px;height: 160px;position: relative;background-color: black;margin: 30px;}
+  .buttons {text-align: center;}
+  .panel {padding: 30px;}
+  .nextText {height: 20px;text-align: center;}
+  .nextBox {width: 160px;height: 160px;position: relative;background-color: #222;}
   .nextBox .next {position: absolute;}
+  .score {margin: 20px 0}
+  .score .row {font-size: 18px;letter-spacing: -1px;padding: 10px 0;}
+  .score .row h4 {display: inline-block;width: 60px;margin: 0;vertical-align: middle;}
+  .score .row span {display: inline-block;width: 90px;text-align: right;vertical-align: middle;}
+  .state {text-align: center;}
 </style>
