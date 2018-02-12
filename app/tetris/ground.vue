@@ -39,9 +39,11 @@
       push (cells) {
         for (let cell of cells) {
           let [x, y] = cell.pos
+          if (!this.ground[y]) return false
           this.ground[y] && this.$set(this.ground[y], x, cell)
         }
         this.$nextTick(this.clearRow)
+        return true
       }
     },
     components: {cell}
