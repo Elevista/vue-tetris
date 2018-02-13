@@ -141,10 +141,9 @@
           this.updateShadow()
         } else if (y < 0) { // go down and touched
           this.getScore(3 * (this.level + 1))
-          if (ground.push(block.cells)) {
-            this.curBlock = null
-            this.$nextTick(this.next) // force recreate state
-          } else this.gameover()
+          let allPushed = ground.push(block.cells)
+          this.curBlock = null
+          allPushed ? this.next() : this.gameover()
         }
         return touched
       },
@@ -182,7 +181,7 @@
           })
       },
       createNextBlock () {
-        let type = this.blocks[Math.floor(Math.random() * this.blocks.length)]
+        let type = _.sample(this.blocks)
         let shapes = this.blockType[type]
         this.nextBlock = {shapes, pos: [0, 0], class: type, id: blockId++}
       },
@@ -196,8 +195,9 @@
         this.curBlock = Object.assign({}, this.nextBlock)
         this.curBlock.pos = [Math.floor(this.width / 2), this.height]
         this.$nextTick(() => {
-          this.move(0, -1)
-          this.move(0, -1)
+          if (this.move(0, -1)) return
+          let {block, ground} = this.$refs
+          ground.checkTouched(block.predictMove(0, -1)) || block.move(0, -1)
           this.createNextBlock()
         })
       }
