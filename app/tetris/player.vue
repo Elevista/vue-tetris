@@ -52,7 +52,7 @@
         rowCleared: 0,
         level: 0,
         score: 0,
-        tickTimeout: 0
+        tickInterval: 0
       }
     },
     computed: {
@@ -82,16 +82,18 @@
         this.$refs.ground.reset()
         this.createNextBlock()
         this.next()
-        this.$nextTick(this.setTick)
         this.state.playing = true
       },
       tick () {
         if (!this.canPlay) return
         this.move(0, -1)
+      },
+      setTick () { this.tickInterval = setInterval(this.tick, this.tickTime) },
+      clearTick () { this.tickInterval = clearInterval(this.tickInterval) },
+      resetTick () {
+        this.clearTick()
         this.setTick()
       },
-      setTick () { this.tickTimeout = setTimeout(this.tick, this.tickTime) },
-      clearTick () { this.tickTimeout = clearTimeout(this.tickTimeout) },
       clearRow (n) {
         this.rowCleared += n
         this.getScore([0, 40, 100, 300, 1200][n] * (this.level + 1))
@@ -122,6 +124,7 @@
             break
           case 'down':
             this.move(0, -1)
+            this.resetTick()
             $event.preventDefault()
             break
         }
@@ -198,6 +201,7 @@
         this.curBlock = Object.assign({}, this.nextBlock)
         this.curBlock.pos = [Math.floor(this.width / 2), this.height]
         this.$nextTick(() => {
+          this.resetTick()
           if (this.move(0, -1)) return
           let {block, ground} = this.$refs
           ground.checkTouched(block.predictMove(0, -1)) || block.move(0, -1)
