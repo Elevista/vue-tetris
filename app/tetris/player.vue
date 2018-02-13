@@ -58,7 +58,7 @@
     computed: {
       tickTime () { return Math.max(11 - this.level, 1) * 50 },
       nextBlockStyle () {
-        return {left: `calc(50% - ${this.cellSize}px)`, top: `calc(50% + ${this.cellSize}px)`}
+        return {left: '50%', top: `calc(50% + ${this.cellSize}px)`}
       },
       canPlay () {
         let {gameover, pause, playing} = this.state
