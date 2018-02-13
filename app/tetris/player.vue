@@ -1,14 +1,14 @@
 <template>
   <div class="player">
     <div :style="{height:height*cellSize+'px',width:width*cellSize+'px'}" class="game">
-      <ground :stage="stage" ref="groundRef" class="ground" @clearRow="clearRow" @clearAll="clearAll"/>
-      <block v-if="block" :init="block" :stage="stage" ref="guideRef" class="guide"/>
-      <block v-if="block" :init="block" :stage="stage" ref="blockRef" :key="block.id"/>
+      <ground :stage="stage" ref="ground" class="ground" @clearRow="clearRow" @clearAll="clearAll"/>
+      <block v-if="curBlock" :init="curBlock" :stage="stage" ref="shadow" :shadow="true"/>
+      <block v-if="curBlock" :init="curBlock" :stage="stage" ref="block" :key="curBlock.id"/>
     </div>
     <div class="panel">
       <h2 class="nextText">Next</h2>
       <div class="nextBox">
-        <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next" :style="nextBlockStyle"/>
+        <block v-if="nextBlock" :init="nextBlock" :stage="stage" class="next" :style="nextBlockStyle" :key="nextBlock.id"/>
       </div>
       <div class="score">
         <div class="row">
@@ -45,7 +45,7 @@
     mixins: [stageComputed],
     data () {
       return {
-        block: null,
+        curBlock: null,
         nextBlock: null,
         actionOf: {},
         state: {playing: false, gameover: false, pause: false},
@@ -56,7 +56,7 @@
       }
     },
     computed: {
-      tickTime () { return (11 - Math.max(0, this.level)) * 50 },
+      tickTime () { return Math.max(11 - this.level, 1) * 50 },
       nextBlockStyle () {
         return {left: `calc(50% - ${this.cellSize}px)`, top: `calc(50% + ${this.cellSize}px)`}
       },
@@ -79,7 +79,7 @@
       start () {
         if (this.state.playing) return
         Object.assign(this, {rowCleared: 0, level: 0, score: 0, state: {playing: true, gameover: false, pause: false}})
-        this.$refs.groundRef.reset()
+        this.$refs.ground.reset()
         this.createNextBlock()
         this.next()
         this.$nextTick(() => { this.tickTimeout = setTimeout(this.tick, this.tickTime) })
@@ -134,15 +134,15 @@
         this.$emit('pause', this.state.pause)
       },
       move (x, y) {
-        let {blockRef, groundRef} = this.$refs
-        let touched = groundRef.checkTouched(blockRef.predictMove(x, y))
+        let {block, ground} = this.$refs
+        let touched = ground.checkTouched(block.predictMove(x, y))
         if (!touched) {
-          blockRef.move(x, y)
-          this.updateGuide()
+          block.move(x, y)
+          this.updateShadow()
         } else if (y < 0) { // go down and touched
           this.getScore(3 * (this.level + 1))
-          if (groundRef.push(blockRef.cells)) {
-            this.block = null
+          if (ground.push(block.cells)) {
+            this.curBlock = null
             this.$nextTick(this.next) // force recreate state
           } else this.gameover()
         }
@@ -156,28 +156,28 @@
         if (!this.canPlay) return
         this.score += v
       },
-      updateGuide () {
-        let {guideRef, blockRef, groundRef} = this.$refs
-        let {idx, x, y} = blockRef
-        Object.assign(guideRef, {idx, x, y})
-        while (!groundRef.checkTouched(guideRef.predictMove(0, -1))) guideRef.move(0, -1)
+      updateShadow () {
+        let {shadow, block, ground} = this.$refs
+        let {idx, x, y} = block
+        Object.assign(shadow, {idx, x, y})
+        while (!ground.checkTouched(shadow.predictMove(0, -1))) shadow.move(0, -1)
       },
       rotate () {
-        let {blockRef, groundRef} = this.$refs
-        let rotate = blockRef.predictRotate()
-        let touched = groundRef.checkTouched(rotate)
+        let {block, ground} = this.$refs
+        let rotate = block.predictRotate()
+        let touched = ground.checkTouched(rotate)
         if (!touched) {
-          blockRef.rotate(0)
-          this.updateGuide()
+          block.rotate(0)
+          this.updateShadow()
           return
         }
         let x = rotate.map(([x]) => x)
         _(1).range(_.max(x) - _.min(x) + 1)
           .flatMap(x => [-x, x])
           .forEach(x => {
-            if (groundRef.checkTouched(blockRef.predictRotate(x))) return
-            blockRef.rotate(x)
-            this.updateGuide()
+            if (ground.checkTouched(block.predictRotate(x))) return
+            block.rotate(x)
+            this.updateShadow()
             return false
           })
       },
@@ -193,8 +193,8 @@
         this.$emit('gameover', this)
       },
       next () {
-        this.block = Object.assign({}, this.nextBlock)
-        this.block.pos = [Math.floor(this.width / 2), this.height]
+        this.curBlock = Object.assign({}, this.nextBlock)
+        this.curBlock.pos = [Math.floor(this.width / 2), this.height]
         this.$nextTick(() => {
           this.move(0, -1)
           this.move(0, -1)
