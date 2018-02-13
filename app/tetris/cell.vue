@@ -1,5 +1,5 @@
 <template>
-  <div :style="style" :class="data.class" class="cell"></div>
+  <div :style="style" :class="display" class="cell"></div>
 </template>
 
 <script>
@@ -10,6 +10,7 @@
     props: ['stage', 'data', 'pos'],
     mixins: [stageComputed],
     computed: {
+      display () { return this.data.class },
       style () {
         return {
           width: this.cellSize + 'px',
