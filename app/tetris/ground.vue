@@ -47,13 +47,13 @@
         rows && this.$emit('clearRow', rows)
       },
       push (cells) {
+        let ret = true
         for (let cell of cells) {
           let [x, y] = cell.pos
-          if (!this.ground[y]) return false
-          this.ground[y] && this.$set(this.ground[y], x, cell)
+          this.ground[y] ? this.$set(this.ground[y], x, cell) : ret = false
         }
         this.$nextTick(this.clearRow)
-        return true
+        return ret
       }
     },
     components: {cell}
