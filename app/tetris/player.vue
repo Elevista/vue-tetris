@@ -82,14 +82,16 @@
         this.$refs.ground.reset()
         this.createNextBlock()
         this.next()
-        this.$nextTick(() => { this.tickTimeout = setTimeout(this.tick, this.tickTime) })
+        this.$nextTick(this.setTick)
         this.state.playing = true
       },
       tick () {
         if (!this.canPlay) return
         this.move(0, -1)
-        this.tickTimeout = setTimeout(this.tick, this.tickTime)
+        this.setTick()
       },
+      setTick () { this.tickTimeout = setTimeout(this.tick, this.tickTime) },
+      clearTick () { this.tickTimeout = clearTimeout(this.tickTimeout) },
       clearRow (n) {
         this.rowCleared += n
         this.getScore([0, 40, 100, 300, 1200][n] * (this.level + 1))
@@ -97,6 +99,7 @@
       },
       clearAll () { this.getScore(3000 * (this.level + 1)) },
       keydown ($event) {
+        if ($event.keyCode === 32) $event.preventDefault()
         if (!this.state.playing) return
         if ($event.keyCode === 27) return this.pause()
         if (!this.canPlay) return
@@ -126,10 +129,10 @@
       pause () {
         if (this.state.pause) {
           this.state.pause = false
-          this.tickTimeout = setTimeout(this.tick, this.tickTime)
+          this.setTick()
         } else {
           this.state.pause = true
-          clearTimeout(this.tickTimeout)
+          this.clearTick()
         }
         this.$emit('pause', this.state.pause)
       },
@@ -188,7 +191,7 @@
       gameover () {
         if (this.state.gameover) return
         Object.assign(this.state, {gameover: true, playing: false})
-        clearTimeout(this.tickTimeout)
+        this.clearTick()
         this.$emit('gameover', this)
       },
       next () {
