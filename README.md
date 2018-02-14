@@ -1,5 +1,5 @@
 # Vue Tetris
-Vue based Tetris 🏰 [Try Demo](https://elevista.github.io/vue-tetris/www)
+Vue based Tetris 🏰 [Try Demo](https://elevista.github.io/vue-tetris)
 
 [https://github.com/elevista/vue-tetris](https://github.com/elevista/vue-tetris)
 
