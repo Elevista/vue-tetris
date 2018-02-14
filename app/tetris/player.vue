@@ -37,12 +37,13 @@
   import block from './block.vue'
   import ground from './ground.vue'
   import stageComputed from './stageComputed'
+  import soundService from './soundService/soundService.mjs'
 
   let blockId = 0
   export default {
     name: 'player',
     props: ['stage', 'keys'],
-    mixins: [stageComputed],
+    mixins: [stageComputed, soundService],
     data () {
       return {
         curBlock: null,
@@ -76,6 +77,10 @@
       window.addEventListener('keydown', this.keydown)
     },
     methods: {
+      // level에 따라 순차 재생
+      playBgm() {
+        this.playSound(`bgm${this.level%4 + 1}`)
+      },
       start () {
         if (this.state.playing) return
         Object.assign(this, {rowCleared: 0, level: 0, score: 0, state: {playing: true, gameover: false, pause: false}})
@@ -83,6 +88,7 @@
         this.createNextBlock()
         this.next()
         this.state.playing = true
+        this.playBgm()
       },
       tick () {
         if (!this.canPlay) return
@@ -132,9 +138,11 @@
       pause () {
         if (this.state.pause) {
           this.state.pause = false
+          this.resumeSound()
           this.setTick()
         } else {
           this.state.pause = true
+          this.pauseSound()
           this.clearTick()
         }
         this.$emit('pause', this.state.pause)
@@ -207,6 +215,12 @@
           ground.checkTouched(block.predictMove(0, -1)) || block.move(0, -1)
           this.createNextBlock()
         })
+      }
+    },
+    watch: {
+      level(from, to) {
+        console.log(from, to)
+        this.playBgm()
       }
     },
     destroyed () { window.removeEventListener('keyodwn', this.keydown) },
