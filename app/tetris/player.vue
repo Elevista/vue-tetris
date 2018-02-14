@@ -77,9 +77,10 @@
       window.addEventListener('keydown', this.keydown)
     },
     methods: {
-      // level에 따라 순차 재생
-      playBgm() {
-        this.playSound(`bgm${this.level%4 + 1}`)
+      playBgm(type) {
+        if (type === 'gameover') {
+          this.playSound('gameover')
+        } else this.playSound(`bgm${this.level%4 + 1}`)
       },
       start () {
         if (this.state.playing) return
@@ -204,6 +205,7 @@
         Object.assign(this.state, {gameover: true, playing: false})
         this.clearTick()
         this.$emit('gameover', this)
+        this.playBgm('gameover')
       },
       next () {
         this.curBlock = Object.assign({}, this.nextBlock)
