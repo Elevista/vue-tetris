@@ -5,6 +5,8 @@ import bgm3 from './sounds/bgm3.mp3'
 import bgm4 from './sounds/bgm4.mp3'
 import complete from './sounds/complete.mp3'
 import gameover from './sounds/gameover.mp3'
+import drop from './sounds/drop.mp3'
+import lineClear from './sounds/lineClear.mp3'
 
 const audios = {
   title,
@@ -13,7 +15,9 @@ const audios = {
   bgm3,
   bgm4,
   complete,
-  gameover
+  gameover,
+  drop,
+  lineClear
 }
 
 export default {
@@ -25,6 +29,9 @@ export default {
   methods: {
     getAudio(fileName) {
       return new Audio(audios[fileName])
+    },
+    playEffect(name) {
+      this.getAudio(name).play()
     },
     playSound(name, isRepeat = false) {
       if (this.currentAudio) this.currentAudio.pause()
