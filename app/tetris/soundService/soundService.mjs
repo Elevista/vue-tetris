@@ -4,7 +4,7 @@ import bgm2 from './sounds/bgm2.mp3'
 import bgm3 from './sounds/bgm3.mp3'
 import bgm4 from './sounds/bgm4.mp3'
 import complete from './sounds/complete.mp3'
-import gameover from './sounds/bgm4.mp3'
+import gameover from './sounds/gameover.mp3'
 
 const audios={
   title,
