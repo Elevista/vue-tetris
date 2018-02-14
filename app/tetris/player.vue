@@ -77,16 +77,10 @@
       window.addEventListener('keydown', this.keydown)
     },
     methods: {
-      playBgm(type) {
-        if (type === 'gameover') {
-          this.playSound('gameover')
-        } else this.playSound(`bgm${this.level%4 + 1}`, true)
+      playBgm (type = `bgm${this.level % 4 + 1}`, isRepeat = true) {
+        this.playSound(type, isRepeat)
       },
-      playFX(name) {
-        const availableEffects = ['drop', 'lineClear']
-        if (!availableEffects.includes(name)) return
-        this.playEffect(name)
-      },
+      playFX (name) { this.playEffect(name) },
       start () {
         if (this.state.playing) return
         Object.assign(this, {rowCleared: 0, level: 0, score: 0, state: {playing: true, gameover: false, pause: false}})
@@ -154,24 +148,26 @@
         }
         this.$emit('pause', this.state.pause)
       },
+      pushBlock () {
+        let {block, ground} = this.$refs
+        this.getScore(3 * (this.level + 1))
+        let allPushed = ground.push(block.cells)
+        this.curBlock = null
+        allPushed ? this.next() : this.gameover()
+        this.playFX('drop')
+      },
       move (x, y) {
         let {block, ground} = this.$refs
         let touched = ground.checkTouched(block.predictMove(x, y))
         if (!touched) {
           block.move(x, y)
           this.updateShadow()
-        } else if (y < 0) { // go down and touched
-          this.getScore(3 * (this.level + 1))
-          let allPushed = ground.push(block.cells)
-          this.curBlock = null
-          allPushed ? this.next() : this.gameover()
-        }
+        } else if (y < 0) this.pushBlock() // go down and touched
         return touched
       },
       moveStraight () {
         while (!this.move(0, -1)) {}
         this.getScore(21 + (3 * this.level))
-        this.playFX('drop')
       },
       getScore (v) {
         if (!this.canPlay) return
@@ -212,7 +208,7 @@
         Object.assign(this.state, {gameover: true, playing: false})
         this.clearTick()
         this.$emit('gameover', this)
-        this.playBgm('gameover')
+        this.playBgm('gameover', false)
       },
       next () {
         this.curBlock = Object.assign({}, this.nextBlock)
@@ -227,9 +223,7 @@
       }
     },
     watch: {
-      level() {
-        this.playBgm()
-      }
+      level () { this.playBgm() }
     },
     destroyed () { window.removeEventListener('keyodwn', this.keydown) },
     components: {ground, block}
