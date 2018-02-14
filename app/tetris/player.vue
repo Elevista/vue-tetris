@@ -80,7 +80,7 @@
       playBgm(type) {
         if (type === 'gameover') {
           this.playSound('gameover')
-        } else this.playSound(`bgm${this.level%4 + 1}`)
+        } else this.playSound(`bgm3`, true)
       },
       start () {
         if (this.state.playing) return
