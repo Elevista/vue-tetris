@@ -82,6 +82,11 @@
           this.playSound('gameover')
         } else this.playSound(`bgm${this.level%4 + 1}`, true)
       },
+      playFX(name) {
+        const availableEffects = ['drop', 'lineClear']
+        if (!availableEffects.includes(name)) return
+        this.playEffect(name)
+      },
       start () {
         if (this.state.playing) return
         Object.assign(this, {rowCleared: 0, level: 0, score: 0, state: {playing: true, gameover: false, pause: false}})
@@ -105,6 +110,7 @@
         this.rowCleared += n
         this.getScore([0, 40, 100, 300, 1200][n] * (this.level + 1))
         this.level = Math.floor(this.rowCleared / 10)
+        this.playFX('lineClear')
       },
       clearAll () { this.getScore(3000 * (this.level + 1)) },
       keydown ($event) {
@@ -165,6 +171,7 @@
       moveStraight () {
         while (!this.move(0, -1)) {}
         this.getScore(21 + (3 * this.level))
+        this.playFX('drop')
       },
       getScore (v) {
         if (!this.canPlay) return
@@ -220,8 +227,7 @@
       }
     },
     watch: {
-      level(from, to) {
-        console.log(from, to)
+      level() {
         this.playBgm()
       }
     },
