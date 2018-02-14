@@ -6,7 +6,7 @@ import bgm4 from './sounds/bgm4.mp3'
 import complete from './sounds/complete.mp3'
 import gameover from './sounds/gameover.mp3'
 
-const audios={
+const audios = {
   title,
   bgm1,
   bgm2,
@@ -26,9 +26,10 @@ export default {
     getAudio(fileName) {
       return new Audio(audios[fileName])
     },
-    playSound(name) {
+    playSound(name, isRepeat = false) {
       if (this.currentAudio) this.currentAudio.pause()
       this.currentAudio = this.getAudio(name)
+      if (isRepeat) this.currentAudio.loop = true
       this.currentAudio.play()
     },
     pauseSound() {
