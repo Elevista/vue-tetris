@@ -27,26 +27,27 @@ export default {
     }
   },
   methods: {
-    getAudio(fileName) {
-      return new Audio(audios[fileName])
+    getAudio (fileName) {
+      return new window.Audio(audios[fileName])
     },
-    playEffect(name) {
+    playEffect (name) {
       this.getAudio(name).play()
     },
-    playSound(name, isRepeat = false) {
+    playSound (name, isRepeat = false) {
       if (this.currentAudio) this.currentAudio.pause()
       this.currentAudio = this.getAudio(name)
       if (isRepeat) this.currentAudio.loop = true
+      this.currentAudio.volume = 0.4
       this.currentAudio.play()
     },
-    pauseSound() {
+    pauseSound () {
       this.currentAudio.pause()
     },
-    resumeSound() {
+    resumeSound () {
       this.currentAudio.play()
     },
-    stopSound() {
-      if(this.currentAudio.currentTime > 0) {
+    stopSound () {
+      if (this.currentAudio.currentTime > 0) {
         this.currentAudio.pause()
         this.currentAudio.currentTime = 0
       }
