@@ -1,8 +1,8 @@
 {
-  "name": "vue-minesweeper",
+  "name": "vue-tetris",
   "private": true,
   "version": "0.0.0",
-  "description": "Vue Minesweeper",
+  "description": "Vue Tetris",
   "keywords": [],
   "devDependencies": {
     "babel-core": "^6.24.1",
