@@ -24,6 +24,14 @@
           <span>{{rowCleared|numberComma}}</span>
         </div>
       </div>
+      <div class="statistics">
+        <span class="title">Statistics</span>
+        <div :key="key" v-for="(value, key) in statistics" class="block">
+          <span class="symbol">{{key}}</span>
+          <span class="number">{{value}}</span>
+          <span class="rate">{{((value / statistics.TOTAL) * 100 || 0)| round(2)}}%</span>
+        </div>
+      </div>
       <div class="buttons">
         <button v-if="state.playing" @click="pause">{{state.pause?'Resume':'Pause'}}</button>
         <button v-else @click="start" autofocus>{{state.gameover?'Restart':'Start'}}</button>
@@ -53,7 +61,8 @@
         rowCleared: 0,
         level: 0,
         score: 0,
-        tickInterval: 0
+        tickInterval: 0,
+        statistics: {I: 0, O: 0, T: 0, S: 0, Z: 0, J: 0, L: 0, TOTAL: 0}
       }
     },
     computed: {
@@ -89,6 +98,7 @@
         this.next()
         this.state.playing = true
         this.playBgm()
+        this.statistics = {I: 0, O: 0, T: 0, S: 0, Z: 0, J: 0, L: 0, TOTAL: 0}
       },
       tick () {
         if (!this.canPlay) return
@@ -200,6 +210,8 @@
       },
       createNextBlock () {
         let type = _.sample(this.blocks)
+        this.statistics[type]++
+        this.statistics.TOTAL++
         let shapes = this.blockType[type]
         this.nextBlock = {shapes, pos: [0, 0], class: type, id: blockId++}
       },
@@ -236,13 +248,17 @@
   .game {position: relative;outline: solid 1px gray;background-color: black; overflow: hidden;}
   .buttons {text-align: center;}
   .buttons button {font-size: 30px;}
-  .panel {padding: 30px;}
+  .panel {padding: 0px 30px;}
   .nextText {height: 20px;text-align: center;}
   .nextBox {width: 160px;height: 160px;position: relative;background-color: #222;}
   .nextBox .next {position: absolute;}
   .score {margin: 20px 0}
-  .score .row {font-size: 18px;letter-spacing: -1px;padding: 10px 0;}
+  .score .row {font-size: 18px;letter-spacing: -1px;padding: 5px 0;}
   .score .row h4 {display: inline-block;width: 60px;margin: 0;vertical-align: middle;}
   .score .row span {display: inline-block;width: 90px;text-align: right;vertical-align: middle;}
   .state {text-align: center;}
+  .statistics {margin-bottom: 20px}
+  .statistics .title {font-weight: bold}
+  .statistics .block .symbol {display: inline-block;width: 60px;font-weight: bold}
+  .statistics .block .number {display: inline-block;width: 40px}
 </style>
