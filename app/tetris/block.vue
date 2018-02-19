@@ -15,16 +15,17 @@
     mixins: [stageComputed],
     data () {
       let {pos: [x, y]} = this.init
-      return {idx: 0, x, y}
+      return {idx: 0, x, y, fromCellId: cellId}
     },
+    created () { cellId += this.shapes.length },
     computed: {
       shapes () { return this.init.shapes },
       length () { return this.shapes.length },
       shape () { return this.shapes[this.idx % this.length] },
       style () { return {left: this.x * this.cellSize + 'px', bottom: this.y * this.cellSize + 'px'} },
       cells () {
-        return this.shape.map(([x, y]) => {
-          return {pos: [x + this.x, y + this.y], data: {class: this.init.class}, id: cellId++}
+        return this.shape.map(([x, y], idx) => {
+          return {pos: [x + this.x, y + this.y], data: {class: this.init.class}, id: this.fromCellId + idx}
         })
       }
     },

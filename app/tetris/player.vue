@@ -261,4 +261,5 @@
   .statistics .title {font-weight: bold}
   .statistics .block .symbol {display: inline-block;width: 60px;font-weight: bold}
   .statistics .block .number {display: inline-block;width: 40px}
+  /*.block:not(.shadow) >>> .cell {transition: all 100ms linear;}*/
 </style>
