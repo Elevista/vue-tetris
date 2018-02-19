@@ -92,13 +92,13 @@
       playFX (name) { this.playEffect(name) },
       start () {
         if (this.state.playing) return
-        Object.assign(this, {rowCleared: 0, level: 0, score: 0, state: {playing: true, gameover: false, pause: false}})
+        let {rowCleared, level, score, state, statistics} = this.$options.data()
+        Object.assign(this, {rowCleared, level, score, state, statistics})
         this.$refs.ground.reset()
         this.createNextBlock()
         this.next()
         this.state.playing = true
         this.playBgm()
-        this.statistics = {I: 0, O: 0, T: 0, S: 0, Z: 0, J: 0, L: 0, TOTAL: 0}
       },
       tick () {
         if (!this.canPlay) return
