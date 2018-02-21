@@ -68,7 +68,7 @@
     computed: {
       tickTime () { return Math.max(11 - this.level, 1) * 50 },
       nextBlockStyle () {
-        return {left: '50%', top: `calc(50% + ${this.cellSize}px)`}
+        return {left: `calc(50% - ${this.cellSize}px)`, top: `calc(50% + ${this.cellSize}px)`}
       },
       canPlay () {
         let {gameover, pause, playing} = this.state
@@ -224,7 +224,7 @@
       },
       next () {
         this.curBlock = Object.assign({}, this.nextBlock)
-        this.curBlock.pos = [Math.floor(this.width / 2), this.height]
+        this.curBlock.pos = [Math.floor(this.width / 2) - 1, this.height]
         this.$nextTick(() => {
           this.resetTick()
           if (this.move(0, -1)) return
