@@ -57,12 +57,12 @@
         curBlock: null,
         nextBlock: null,
         actionOf: {},
-        state: {playing: false, gameover: false, pause: false},
-        rowCleared: 0,
-        level: 0,
-        score: 0,
         tickInterval: 0,
-        statistics: {I: 0, O: 0, T: 0, S: 0, Z: 0, J: 0, L: 0, TOTAL: 0}
+        rowCleared: null,
+        level: null,
+        score: null,
+        state: null,
+        statistics: null
       }
     },
     computed: {
@@ -84,16 +84,25 @@
     created () {
       _.forEach(this.keys, (v, k) => this.$set(this.actionOf, v, k))
       window.addEventListener('keydown', this.keydown)
+      this.reset()
     },
     methods: {
+      reset () {
+        Object.assign(this, {
+          rowCleared: 0,
+          level: 0,
+          score: 0,
+          state: {playing: false, gameover: false, pause: false},
+          statistics: _(this.stage.blocks).map(x => [x, 0]).fromPairs().assign({TOTAL: 0}).value()
+        })
+      },
       playBgm (type = `bgm${this.level % 4 + 1}`, isRepeat = true) {
         this.playSound(type, isRepeat)
       },
       playFX (name) { this.playEffect(name) },
       start () {
         if (this.state.playing) return
-        let {rowCleared, level, score, state, statistics} = this.$options.data()
-        Object.assign(this, {rowCleared, level, score, state, statistics})
+        this.reset()
         this.$refs.ground.reset()
         this.createNextBlock()
         this.next()
