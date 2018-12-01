@@ -7,6 +7,7 @@ import complete from './sounds/complete.mp3'
 import gameover from './sounds/gameover.mp3'
 import drop from './sounds/drop.mp3'
 import lineClear from './sounds/lineClear.mp3'
+import _ from 'lodash'
 
 const audios = {
   title,
@@ -23,7 +24,8 @@ const audios = {
 export default {
   data () {
     return {
-      currentAudio: null
+      currentAudio: null,
+      muted: false
     }
   },
   methods: {
@@ -31,13 +33,14 @@ export default {
       return new window.Audio(audios[fileName])
     },
     playEffect (name) {
-      this.getAudio(name).play()
+      !this.muted && this.getAudio(name).play()
     },
     playSound (name, isRepeat = false) {
       if (this.currentAudio) this.currentAudio.pause()
       this.currentAudio = this.getAudio(name)
       if (isRepeat) this.currentAudio.loop = true
       this.currentAudio.volume = 0.4
+      this.currentAudio.muted = this.muted
       this.currentAudio.play()
     },
     pauseSound () {
@@ -51,6 +54,10 @@ export default {
         this.currentAudio.pause()
         this.currentAudio.currentTime = 0
       }
+    },
+    muteSound () {
+      this.muted = !this.muted
+      _.assign(this.currentAudio, {muted: this.muted})
     }
   }
 }

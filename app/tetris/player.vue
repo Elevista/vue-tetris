@@ -35,6 +35,7 @@
       <div class="buttons">
         <button v-if="state.playing" @click="pause">{{state.pause?'Resume':'Pause'}}</button>
         <button v-else @click="start" autofocus>{{state.gameover?'Restart':'Start'}}</button>
+        <button @click="muteSound">mute</button>
       </div>
       <h2 class="state">{{stateText}}</h2>
     </div>
@@ -244,7 +245,7 @@
       }
     },
     watch: {
-      level () { this.playBgm() }
+      level (v) { v && this.playBgm() }
     },
     destroyed () { window.removeEventListener('keyodwn', this.keydown) },
     components: {ground, block}
